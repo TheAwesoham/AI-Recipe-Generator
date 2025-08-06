@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Recipe Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #fdfbfb, #ebedee);
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.5s ease;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 32px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      transition: border-color 0.3s;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #4CAF50;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #43a047;
+    }
+
+    .recipe-output {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #f6f6f6;
+      border-radius: 12px;
+      white-space: pre-wrap;
+      color: #333;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    .recipe-output h2 {
+      margin-top: 0;
+      text-align: center;
+      color: #444;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🥘 AI Recipe Generator</h1>
+
+  <div class="form-group">
+    <label for="preferences">Preferences (e.g. spicy, vegan):</label>
+    <input type="text" id="preferences" placeholder="Enter your preferences" />
+  </div>
+
+  <div class="form-group">
+    <label for="restrictions">Dietary Restrictions (e.g. gluten-free):</label>
+    <input type="text" id="restrictions" placeholder="Enter dietary restrictions" />
+  </div>
+
+  <div class="form-group">
+    <label for="ingredients">Available Ingredients:</label>
+    <textarea id="ingredients" rows="4" placeholder="e.g. chicken, rice, broccoli"></textarea>
+  </div>
+
+  <button onclick="generateRecipe()">Generate Recipe</button>
+
+  <div class="recipe-output" id="recipe-output"></div>
+</div>
+
+<script>
+  async function generateRecipe() {
+    const preferences = document.getElementById('preferences').value;
+    const restrictions = document.getElementById('restrictions').value;
+    const ingredients = document.getElementById('ingredients').value;
+    const outputDiv = document.getElementById('recipe-output');
+
+    outputDiv.innerHTML = "🔄 Generating your recipe...";
+
+    try {
+      const response = await fetch('http://localhost:5000/generate-recipe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preferences, restrictions, ingredients })
+      });
+
+      const result = await response.json();
+
+      if (result.recipe) {
+        outputDiv.innerHTML = `
+          <h2>🍽️ Your AI-Generated Recipe</h2>
+          ${result.recipe}
+        `;
+      } else {
+        outputDiv.innerHTML = `<p><strong>Error:</strong> ${result.error}</p>`;
+      }
+    } catch (error) {
+      outputDiv.innerHTML = `<p><strong>Fetch Error:</strong> ${error.message}</p>`;
+    }
+  }
+</script>
+
+</body>
+</html>
